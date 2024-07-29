@@ -19,11 +19,14 @@ import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
+import { signIn } from "next-auth/react";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { useRouter } from "next/navigation";
 export const LoginForm = () => {
   const  [error, setError] = useState<string | undefined>("")
   const  [success, setSuccess] = useState<string | undefined>("")
   const [isPending, startTransition] = useTransition();
-
+  const router = useRouter();
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -33,14 +36,21 @@ export const LoginForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    console.log("Succesfully logged in")
+    const validatedFields = LoginSchema.safeParse(values);
+    if(validatedFields.data) {
+
+    const { email, password } = validatedFields.data;
     setError("");
     setSuccess("");
     startTransition(() => {
       login(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        setError(data?.error);
+        setSuccess(data?.success);
       })
     });
+    }
+    
   };
 
   console.log(form.formState);
