@@ -15,6 +15,7 @@ const LoginButton = ({
 }: LoginButtonInterface) => {
   const router = useRouter();
   const onClick = () => {
+    console.log("router.push");
     router.push("login");
   };
 
